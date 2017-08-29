@@ -22,7 +22,7 @@ class BaseBackend(object):
 
     def __init__(self, notification, *args, **kwargs):
         self.notification = notification
-        self.template = ('/notifier/%s_%s.txt' % (notification.name, self.name))
+        self.template = ('%s_%s.txt' % (notification.name, self.name))
 
     # Define how to send the notification
     def send(self, user, context=None):
@@ -53,6 +53,7 @@ class EmailBackend(BaseBackend):
         )
 
     def send(self, user, context=None):
+        import pdb;pdb.set_trace()
         super(EmailBackend, self).send(user, context)
 
         subject = render_to_string(self.template_subject, self.context)
@@ -61,8 +62,8 @@ class EmailBackend(BaseBackend):
 
         try:
             send_mail(subject, message, settings.DEFAULT_FROM_EMAIL,
-                [user.email])
+                [user.email], fail_silently=False)
         except SMTPException:
-            return False
+            raise SMTPException
         else:
             return True
